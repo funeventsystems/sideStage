@@ -104,7 +104,17 @@
     <h3>Absentees:</h3>
     <ol id="absenteesList"></ol>
 </div>
-  
+<h2>Private Feedback</h2>
+<form id="privateFeedbackForm">
+    <label for="feedbackUser">Select User:</label>
+    <select id="feedbackUser" name="feedbackUser"></select>
+
+    <label for="feedback">Feedback:</label>
+    <textarea id="feedback" name="feedback" required></textarea>
+
+    <button type="button" onclick="submitFeedback()">Submit Feedback</button>
+</form>
+
     </div>
 
     <script>
@@ -238,6 +248,51 @@
         // Fetch the username based on userId
         const user = users.find(u => u.id === userId);
         return user ? user.username : 'Unknown User';
+    }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Fetch users and populate the feedback dropdown
+        fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                const feedbackUserDropdown = document.getElementById('feedbackUser');
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.username;
+                    feedbackUserDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    });
+
+    function submitFeedback() {
+        const form = document.getElementById('privateFeedbackForm');
+        const userId = form.querySelector('#feedbackUser').value;
+        const feedbackText = form.querySelector('#feedback').value;
+
+        // Create a JSON object
+        const feedbackData = {
+            userId: userId,
+            feedback: feedbackText,
+        };
+
+        // Send feedback to the server
+        fetch('/submitFeedback', {
+            method: 'POST',
+            body: JSON.stringify(feedbackData),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Feedback submitted successfully');
+            form.reset();
+        })
+        .catch(error => console.error('Error submitting feedback:', error));
     }
     </script>
 </body>

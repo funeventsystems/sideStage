@@ -8,7 +8,8 @@ const path = require('path');
 
 const app = express();
 const port = 3000;
-
+const privateFeedbackFile = 'data/privateFeedback.json';
+let privateFeedbackData = loadPrivateFeedback();
 
 
 // Middleware
@@ -163,7 +164,45 @@ app.post('/markAbsence/:eventId', isAuthenticated, (req, res) => {
 });
 
 
+app.post('/submitFeedback', (req, res) => {
+    const feedbackData = req.body;
 
+    // Add the feedback to the storage
+    privateFeedbackData.push(feedbackData);
+
+    // Save the updated feedback data to the JSON file
+    savePrivateFeedback(privateFeedbackData);
+
+    res.json({ success: true });
+});
+
+app.get('/feedback', isAuthenticated, (req, res) => {
+    const userId = req.user.id;
+
+    // Retrieve feedback for the authenticated user
+    const userFeedback = privateFeedbackData.filter(feedback => feedback.userId === userId);
+
+    res.json(userFeedback);
+});
+
+
+
+// Helper function to load private feedback data from the JSON file
+function loadPrivateFeedback() {
+    try {
+        const data = fs.readFileSync(privateFeedbackFile);
+        return JSON.parse(data);
+    } catch (error) {
+        // If the file doesn't exist or there's an error reading it, return an empty array
+        return [];
+    }
+}
+
+// Helper function to save private feedback data to the JSON file
+function savePrivateFeedback(data) {
+    const jsonData = JSON.stringify(data, null, 2);
+    fs.writeFileSync(privateFeedbackFile, jsonData);
+}
 
 // Start the server
 app.listen(port, () => {

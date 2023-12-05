@@ -5,17 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
 
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .admin-links {
+            display: none;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .collapsible:hover {
+            background-color: #f5f5f5;
+        }
+
+        .content {
+            display: none;
+            padding: 10px;
+            border-top: none;
+        }
+    </style>
 </head>
 <body>
     <h1>User Dashboard</h1>
     <a href="/calendar">View Calendar</a>
 
     <!-- Collapsible section for admin links -->
-    <p>Admin Links</p>
+    <div class="collapsible" onclick="toggleAdminLinks()">Admin Links</div>
     <div class="admin-links">
         <a href="/admin">Admin Page</a>
         <!-- Add additional admin links as needed -->
     </div>
 
+    <!-- Collapsible section for feedback -->
+    <div class="collapsible" onclick="toggleFeedback()">Feedback</div>
+    <div class="content" id="feedbackContent">
+        <!-- Feedback will be dynamically inserted here using JavaScript -->
+    </div>
+
+    <script>
+        // Function to toggle visibility of admin links
+        function toggleAdminLinks() {
+            const adminLinks = document.querySelector('.admin-links');
+            adminLinks.style.display = adminLinks.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Function to toggle visibility of feedback content and fetch feedback from the server
+        function toggleFeedback() {
+            const feedbackContent = document.getElementById('feedbackContent');
+            feedbackContent.style.display = feedbackContent.style.display === 'none' ? 'block' : 'none';
+
+            // If feedback content is visible, fetch feedback from the server and display it
+            if (feedbackContent.style.display === 'block') {
+                fetchFeedbackData();
+            }
+        }
+
+        // Function to fetch feedback data from the server
+        function fetchFeedbackData() {
+            fetch('/feedback') // Replace '/feedback' with the actual endpoint to fetch feedback data
+                .then(response => response.json())
+                .then(feedbackData => displayFeedback(feedbackData))
+                .catch(error => console.error('Error fetching feedback:', error));
+        }
+
+        // Function to dynamically insert feedback items into the feedback content
+        function displayFeedback(feedbackItems) {
+            const feedbackContent = document.getElementById('feedbackContent');
+            feedbackContent.innerHTML = '';
+
+            feedbackItems.forEach(item => {
+                const feedbackItem = document.createElement('p');
+                feedbackItem.textContent = `User ID: ${item.userId}, Feedback: ${item.feedback}`;
+                feedbackContent.appendChild(feedbackItem);
+            });
+        }
+    </script>
 </body>
 </html>
