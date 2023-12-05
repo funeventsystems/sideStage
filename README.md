@@ -1,9 +1,7 @@
-# drama-team-management
- 
 
 ## Introduction
 
-Welcome to the documentation for the [Software Name]. This software is designed to provide a secure and flexible user authentication system along with a calendar and feedback submission functionality. Please follow the instructions below to get started.
+Welcome to the documentation for the Team Manager. This software is designed to provide a secure and flexible user authentication system along with a calendar and feedback submission functionality. Please follow the instructions below to get started.
 
 ## Table of Contents
 
