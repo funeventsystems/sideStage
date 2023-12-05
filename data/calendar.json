@@ -1,0 +1,110 @@
+[
+  {
+    "id": "znhg9h",
+    "users": [
+      "1",
+      "2",
+      "3"
+    ],
+    "title": "Rehearsal #1",
+    "date": "2023-12-05",
+    "description": "Rehearsal for everyone!",
+    "absences": [
+      {
+        "userId": "2",
+        "reason": "illness"
+      },
+      {
+        "userId": "2",
+        "reason": "illness"
+      },
+      {
+        "userId": "2",
+        "reason": "illness"
+      },
+      {
+        "userId": "2",
+        "reason": "illness"
+      },
+      {
+        "userId": "2",
+        "reason": "illness"
+      },
+      {
+        "userId": "3",
+        "reason": "sport"
+      }
+    ]
+  },
+  {
+    "id": "bf7tar",
+    "users": [
+      "1"
+    ],
+    "title": "User",
+    "date": "2023-12-07",
+    "description": "User"
+  },
+  {
+    "id": "nbqnz",
+    "users": [],
+    "title": "Test",
+    "date": "2023-12-08",
+    "description": "test"
+  },
+  {
+    "id": "3tepmc",
+    "users": [
+      "2"
+    ],
+    "title": "admin",
+    "date": "2023-12-20",
+    "description": "Admin",
+    "absences": [
+      {
+        "userId": "2",
+        "reason": "sickness"
+      }
+    ]
+  },
+  {
+    "id": "lhrv1c",
+    "users": [
+      "1",
+      "2"
+    ],
+    "title": "user and admin",
+    "date": "2023-12-07",
+    "description": "User and admin"
+  },
+  {
+    "id": "9gnjeq",
+    "users": [
+      "2"
+    ],
+    "title": "RED3",
+    "date": "2023-12-05",
+    "description": "RED3",
+    "color": "#f50000"
+  },
+  {
+    "id": "ezp0zio",
+    "users": [
+      "2"
+    ],
+    "title": "BLUE",
+    "date": "2023-12-06",
+    "description": "BLUE",
+    "color": "#3700ff"
+  },
+  {
+    "id": "dx2nt",
+    "users": [
+      "2"
+    ],
+    "title": "GREEN",
+    "date": "2023-12-20",
+    "description": "GREEN",
+    "color": "#11ff00"
+  }
+]

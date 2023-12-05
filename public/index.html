@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007aff;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #007aff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            /* Adjust styles for screens with a maximum width of 600px (typical for mobile) */
+            h1, a {
+                display: block; /* Set display to block to make them appear on separate lines */
+                width: 100%; /* Make the button full width */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Main Page!</h1><br><br><br>
+    <a href="/login">Login</a>
+</body>
+</html>

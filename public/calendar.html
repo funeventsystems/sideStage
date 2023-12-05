@@ -1,0 +1,159 @@
+<!-- Updated Calendar Page with Absence Feature -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        .calendar-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .event {
+            border: 1px solid #ccc;
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden; /* Ensures rounded corners are applied */
+        }
+
+        .event:hover {
+            background-color: #f0f0f0;
+        }
+
+        .event-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 30px; /* Add padding for the color dot */
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .event-details {
+            display: none;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .event.active .event-details {
+            display: block;
+        }
+
+        .absence-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container" id="calendar-container">
+        <h1>Calendar</h1>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const calendarContainer = document.getElementById('calendar-container');
+
+    // Fetch data from the /calendar endpoint
+    fetch('/events')
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(event => {
+          const eventElement = createEventElement(event);
+          calendarContainer.appendChild(eventElement);
+        });
+      })
+      .catch(error => console.error('Error fetching calendar data:', error));
+
+    function createEventElement(event) {
+      const eventElement = document.createElement('div');
+      eventElement.classList.add('event');
+      eventElement.dataset.eventId = event.id;
+
+      const titleAndDateElement = document.createElement('div');
+      titleAndDateElement.classList.add('event-title');
+
+      const colorDot = document.createElement('div');
+      colorDot.classList.add('color-dot');
+      colorDot.style.backgroundColor = event.color || '#000000';
+
+      const titleElement = document.createElement('strong');
+      titleElement.textContent = event.title;
+
+      const dateElement = document.createElement('span');
+      dateElement.textContent = `Date: ${event.date}`;
+
+      titleAndDateElement.appendChild(colorDot);
+      titleAndDateElement.appendChild(titleElement);
+      titleAndDateElement.appendChild(dateElement);
+
+      const detailsElement = document.createElement('div');
+      detailsElement.classList.add('event-details');
+      detailsElement.innerHTML = `<p>ID: ${event.id}</p><p>Description: ${event.description}</p>`;
+
+      // Add a button to mark absence
+      const absenceButton = document.createElement('button');
+      absenceButton.textContent = 'Mark Absence';
+      absenceButton.addEventListener('click', function () {
+        markAbsence(event.id);
+      });
+
+      detailsElement.appendChild(absenceButton);
+
+      eventElement.appendChild(titleAndDateElement);
+      eventElement.appendChild(detailsElement);
+
+      eventElement.addEventListener('click', function () {
+        eventElement.classList.toggle('active');
+      });
+
+      return eventElement;
+    }
+
+    function markAbsence(eventId) {
+      const reason = prompt('Enter reason for absence:');
+      if (reason !== null) {
+        // Send a POST request to mark absence
+        fetch(`/markAbsence/${eventId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reason }),
+        })
+          .then(response => response.text())
+          .then(data => {
+            alert(data);
+          })
+          .catch(error => console.error('Error marking absence:', error));
+      }
+    }
+  });
+    </script>
+</body>
+</html>
