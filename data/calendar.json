@@ -106,5 +106,15 @@
     "date": "2023-12-20",
     "description": "GREEN",
     "color": "#11ff00"
+  },
+  {
+    "id": "7pfb5s",
+    "users": [
+      "2"
+    ],
+    "title": "New year!",
+    "date": "2024-01-09",
+    "description": "Test",
+    "color": "#000000"
   }
 ]
