@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Notebooks</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #notebooksList {
+      list-style: none;
+      padding: 0;
+    }
+
+    .notebook {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .notebook-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .notebook-content {
+      margin-top: 10px;
+    }
+
+    #createNotebookForm,
+    #editNotebookForm {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Private Notebooks</h1>
+
+  <ul id="notebooksList"></ul>
+
+  <div id="createNotebookForm">
+    <h2>Create a New Notebook</h2>
+    <form id="createForm">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" rows="4" required></textarea>
+
+      <button type="submit">Create Notebook</button>
+    </form>
+  </div>
+
+  <div id="editNotebookForm">
+    <h2>Edit Notebook</h2>
+    <form id="editForm">
+      <input type="hidden" id="editNotebookId" name="editNotebookId">
+
+      <label for="editTitle">Title:</label>
+      <input type="text" id="editTitle" name="editTitle" required>
+
+      <label for="editContent">Content:</label>
+      <textarea id="editContent" name="editContent" rows="4" required></textarea>
+
+      <button type="submit">Save Changes</button>
+      <button type="button" id="cancelEdit">Cancel</button>
+    </form>
+  </div>
+
+  <script>
+    let editingNotebookId = null;
+
+    // Function to fetch and display user's notebooks
+    async function fetchNotebooks() {
+      try {
+        const response = await fetch('/notebooks');
+        const notebooks = await response.json();
+
+        const notebooksList = document.getElementById('notebooksList');
+        notebooksList.innerHTML = '';
+
+        notebooks.forEach(notebook => {
+          const notebookItem = document.createElement('li');
+          notebookItem.classList.add('notebook');
+
+          const titleElement = document.createElement('div');
+          titleElement.classList.add('notebook-title');
+          titleElement.textContent = notebook.title;
+
+          const contentElement = document.createElement('div');
+          contentElement.classList.add('notebook-content');
+          contentElement.textContent = notebook.content;
+
+          const editButton = document.createElement('button');
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', () => startEdit(notebook));
+
+          notebookItem.appendChild(titleElement);
+          notebookItem.appendChild(contentElement);
+          notebookItem.appendChild(editButton);
+
+          notebooksList.appendChild(notebookItem);
+        });
+      } catch (error) {
+        console.error('Error fetching notebooks:', error.message);
+      }
+    }
+
+    // Function to handle notebook creation form submission
+    async function handleCreateFormSubmit(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const title = form.elements.title.value;
+      const content = form.elements.content.value;
+
+      try {
+        const response = await fetch('/createNotebook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, content }),
+        });
+
+        const newNotebook = await response.json();
+        console.log('New notebook created:', newNotebook);
+
+        // Clear the form fields
+        form.reset();
+
+        // Fetch and display updated notebooks
+        fetchNotebooks();
+      } catch (error) {
+        console.error('Error creating notebook:', error.message);
+      }
+    }
+
+    // Function to handle notebook edit form submission
+    async function handleEditFormSubmit(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const notebookId = form.elements.editNotebookId.value;
+      const title = form.elements.editTitle.value;
+      const content = form.elements.editContent.value;
+
+      try {
+        const response = await fetch(`/notebook/${notebookId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, content }),
+        });
+
+        const updatedNotebook = await response.json();
+        console.log('Notebook updated:', updatedNotebook);
+
+        // Reset the editing state
+        editingNotebookId = null;
+        hideEditForm();
+
+        // Fetch and display updated notebooks
+        fetchNotebooks();
+      } catch (error) {
+        console.error('Error updating notebook:', error.message);
+      }
+    }
+
+    // Function to start editing a notebook
+    function startEdit(notebook) {
+      editingNotebookId = notebook.id;
+
+      // Populate edit form with current notebook data
+      const editForm = document.getElementById('editForm');
+      editForm.elements.editNotebookId.value = notebook.id;
+      editForm.elements.editTitle.value = notebook.title;
+      editForm.elements.editContent.value = notebook.content;
+
+      // Show edit form
+      document.getElementById('editNotebookForm').style.display = 'block';
+    }
+
+    // Function to hide the edit form
+    function hideEditForm() {
+      document.getElementById('editNotebookForm').style.display = 'none';
+    }
+
+    // Function to cancel the edit process
+    function cancelEdit() {
+      editingNotebookId = null;
+      hideEditForm();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch and display initial notebooks
+      fetchNotebooks();
+
+      // Attach form submission handlers
+      const createForm = document.getElementById('createForm');
+      const editForm = document.getElementById('editForm');
+
+      createForm.addEventListener('submit', handleCreateFormSubmit);
+      editForm.addEventListener('submit', handleEditFormSubmit);
+
+      // Attach cancel edit button handler
+      const cancelEditButton = document.getElementById('cancelEdit');
+      cancelEditButton.addEventListener('click', cancelEdit);
+    });
+  </script>
+
+</body>
+</html>

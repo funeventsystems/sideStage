@@ -64,6 +64,9 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
 app.get('/calendar', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'calendar.html'));
   });
+  app.get('/notes', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'notes.html'));
+  });
 
 app.get('/events', isAuthenticated, (req, res) => {
     // Display calendar (view-only mode)
@@ -93,7 +96,7 @@ app.post('/addEvent', isAdmin, (req, res) => {
     res.json(newEvent);
 });
   
-  app.get('/users', isAuthenticated, (req, res) => {
+app.get('/users', isAuthenticated, (req, res) => {
     res.json(userData);
 });
 
@@ -203,7 +206,101 @@ function savePrivateFeedback(data) {
     const jsonData = JSON.stringify(data, null, 2);
     fs.writeFileSync(privateFeedbackFile, jsonData);
 }
+// Private notebook data
+const privateNotebookFile = 'data/privateNotebooks.json';
+let privateNotebookData = loadPrivateNotebooks();
 
+// ...
+
+// Endpoint to create a private notebook
+app.post('/createNotebook', isAuthenticated, (req, res) => {
+  const newNotebook = {
+    id: generateId(),
+    userId: req.user.id,
+    title: req.body.title || 'Untitled Notebook',
+    content: req.body.content || '',
+  };
+
+  privateNotebookData.push(newNotebook);
+  savePrivateNotebooks(privateNotebookData);
+
+  res.json(newNotebook);
+});
+
+// Endpoint to get all private notebooks of the authenticated user
+app.get('/notebooks', isAuthenticated, (req, res) => {
+  const userId = req.user.id;
+  const userNotebooks = privateNotebookData.filter(notebook => notebook.userId === userId);
+
+  res.json(userNotebooks);
+});
+
+// Endpoint to get a specific private notebook
+app.get('/notebook/:notebookId', isAuthenticated, (req, res) => {
+  const userId = req.user.id;
+  const notebookId = req.params.notebookId;
+
+  const userNotebook = privateNotebookData.find(notebook => notebook.id === notebookId && notebook.userId === userId);
+
+  if (userNotebook) {
+    res.json(userNotebook);
+  } else {
+    res.status(404).json({ error: 'Notebook not found' });
+  }
+});
+
+// Endpoint to update a private notebook
+app.put('/notebook/:notebookId', isAuthenticated, (req, res) => {
+  const userId = req.user.id;
+  const notebookId = req.params.notebookId;
+
+  const userNotebookIndex = privateNotebookData.findIndex(notebook => notebook.id === notebookId && notebook.userId === userId);
+
+  if (userNotebookIndex !== -1) {
+    privateNotebookData[userNotebookIndex].title = req.body.title || privateNotebookData[userNotebookIndex].title;
+    privateNotebookData[userNotebookIndex].content = req.body.content || privateNotebookData[userNotebookIndex].content;
+
+    savePrivateNotebooks(privateNotebookData);
+
+    res.json(privateNotebookData[userNotebookIndex]);
+  } else {
+    res.status(404).json({ error: 'Notebook not found' });
+  }
+});
+
+// Endpoint to delete a private notebook
+app.delete('/notebook/:notebookId', isAuthenticated, (req, res) => {
+  const userId = req.user.id;
+  const notebookId = req.params.notebookId;
+
+  const userNotebookIndex = privateNotebookData.findIndex(notebook => notebook.id === notebookId && notebook.userId === userId);
+
+  if (userNotebookIndex !== -1) {
+    const deletedNotebook = privateNotebookData.splice(userNotebookIndex, 1)[0];
+    savePrivateNotebooks(privateNotebookData);
+
+    res.json(deletedNotebook);
+  } else {
+    res.status(404).json({ error: 'Notebook not found' });
+  }
+});
+
+// Helper function to load private notebook data from the JSON file
+function loadPrivateNotebooks() {
+  try {
+    const data = fs.readFileSync(privateNotebookFile);
+    return JSON.parse(data);
+  } catch (error) {
+    // If the file doesn't exist or there's an error reading it, return an empty array
+    return [];
+  }
+}
+
+// Helper function to save private notebook data to the JSON file
+function savePrivateNotebooks(data) {
+  const jsonData = JSON.stringify(data, null, 2);
+  fs.writeFileSync(privateNotebookFile, jsonData);
+}
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
