@@ -10,53 +10,31 @@
             margin: 20px;
         }
 
-        .admin-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
         h1 {
             text-align: center;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            margin-bottom: 5px;
-        }
-
-        input {
-            margin-bottom: 10px;
-            padding: 8px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .event-list {
-            margin-top: 20px;
-        }
-
-        .event-list label {
+        a {
             display: block;
-            margin-bottom: 5px;
-        }
-
-        .event-details {
             margin-top: 20px;
+            padding: 20px;
+            background-color: #007aff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
 
-        .event-details h2 {
-            margin-bottom: 10px;
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            h1, a {
+                display: block;
+                width: 100%;
+            }
         }
     </style>
 </head>

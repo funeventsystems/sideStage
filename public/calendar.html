@@ -7,71 +7,87 @@
     <title>Calendar</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 20px;
-        }
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+}
 
-        .calendar-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+.calendar-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+}
 
-        h1 {
-            text-align: center;
-        }
+h1 {
+    text-align: center;
+    color: #007aff;
+}
 
-        .event {
-            border: 1px solid #ccc;
-            margin: 5px;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+.event {
+    border: 1px solid #ccc;
+    margin: 10px;
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
 
-        .event:hover {
-            background-color: #f0f0f0;
-        }
+.event:hover {
+    background-color: #f0f0f0;
+}
 
-        .event.active {
-            box-shadow: 0 0 10px yellow; /* Glow effect for the current day */
-        }
+.event.active {
+    box-shadow: 0 0 10px yellow; /* Glow effect for the current day */
+}
 
-        .event-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-right: 30px;
-        }
+.event-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 30px;
+}
 
-        .color-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
+.color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
 
-        .event-details {
-            display: none;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
+.event-details {
+    display: none;
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
 
-        .event.active .event-details {
-            display: block;
-        }
+.event.active .event-details {
+    display: block;
+}
 
-        .absence-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
+.absence-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+@media (max-width: 600px) {
+    .event-title {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-right: 0;
+    }
+}
+
     </style>
 </head>
 
