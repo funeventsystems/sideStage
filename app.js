@@ -49,6 +49,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -301,6 +302,38 @@ function savePrivateNotebooks(data) {
   const jsonData = JSON.stringify(data, null, 2);
   fs.writeFileSync(privateNotebookFile, jsonData);
 }
+
+
+
+app.post('/register', (req, res) => {
+  const { username, password, role } = req.body;
+
+  // Check if the username is already taken
+  if (userData.some(user => user.username === username)) {
+    return res.status(400).json({ error: 'Username already taken' });
+  }
+
+  // Generate a new user ID
+  const newUserId = generateId();
+
+  // Create a new user object
+  const newUser = {
+    id: newUserId,
+    username,
+    password,
+    role // You can set the default role for new users
+  };
+
+  // Add the new user to the userData array
+  userData.push(newUser);
+
+  // Save the updated user data to the JSON file
+  saveData('users.json', userData);
+
+  // Redirect to the login page after successful registration
+  res.status(200).json({ message: 'Success' });
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

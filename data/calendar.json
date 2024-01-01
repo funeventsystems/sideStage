@@ -95,7 +95,13 @@
     "title": "BLUE",
     "date": "2023-12-06",
     "description": "BLUE",
-    "color": "#3700ff"
+    "color": "#3700ff",
+    "absences": [
+      {
+        "userId": "2",
+        "reason": "TEST"
+      }
+    ]
   },
   {
     "id": "dx2nt",

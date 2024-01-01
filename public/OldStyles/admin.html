@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Events</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #007aff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            h1, a {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Manage Events</h1>
+
+        <!-- Add Event Form -->
+        <h2>Add Event</h2>
+        <form id="addEventForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label>Users:</label>
+            <div id="userCheckboxes"></div>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="color">Color:</label>
+            <input type="color" id="color" name="color" value="#000000">
+
+            <button type="button" onclick="addEvent()">Add Event</button>
+        </form>
+        <h2>Remove Event</h2>
+        <form id="removeEventForm">
+            <label for="eventId">Enter Event ID to Remove:</label>
+            <input type="text" id="eventId" name="eventId" required>
+            <button type="button" onclick="removeEvent()">Remove Event</button>
+        </form>
+        <h2>Absentees List</h2>
+<form id="absenteesListForm">
+    <label for="absentEvent">Select Event:</label>
+    <select id="absentEvent" name="absentEvent"></select>
+
+    <label for="absentDate">Select Date:</label>
+    <input type="date" id="absentDate" name="absentDate" required>
+
+    <button type="button" onclick="getAbsentees()">Get Absentees</button>
+</form>
+<div id="absenteesListContainer">
+    <h3>Absentees:</h3>
+    <ol id="absenteesList"></ol>
+</div>
+<h2>Private Feedback</h2>
+<form id="privateFeedbackForm">
+    <label for="feedbackUser">Select User:</label>
+    <select id="feedbackUser" name="feedbackUser"></select>
+
+    <label for="feedback">Feedback:</label>
+    <textarea id="feedback" name="feedback" required></textarea>
+
+    <button type="button" onclick="submitFeedback()">Submit Feedback</button>
+</form>
+
+    </div>
+    <h2>User Registration</h2>
+    <form action="/register" method="post">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <br>
+      <input type="radio" id="htmlRole" name="role" value="user">
+      <label for="user">User</label><br>
+      <input type="radio" id="htmlRole" name="role" value="admin">
+      <label for="admin">Admin</label><br>
+      <br>
+      <button type="submit">Register</button>
+    </form>
+
+    <script>
+        
+    document.addEventListener('DOMContentLoaded', function () {
+        // Fetch users and populate checkboxes
+        fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                // Store the users array for later use
+                window.users = users;
+
+                const userCheckboxesContainer = document.getElementById('userCheckboxes');
+                users.forEach(user => {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `user${user.id}`;
+                    checkbox.name = 'users[]';
+                    checkbox.value = user.id;
+
+                    const label = document.createElement('label');
+                    label.for = `user${user.id}`;
+                    label.textContent = user.username;
+
+                    userCheckboxesContainer.appendChild(checkbox);
+                    userCheckboxesContainer.appendChild(label);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    });
+
+        function addEvent() {
+        const form = document.getElementById('addEventForm');
+
+        // Manually add selected user IDs to the formData
+        const selectedUsers = Array.from(form.querySelectorAll('input[name="users[]"]:checked')).map(checkbox => checkbox.value);
+
+        // Create a JSON object
+        const eventData = {
+            title: form.querySelector('#title').value,
+            date: form.querySelector('#date').value,
+            description: form.querySelector('#description').value,
+            users: selectedUsers,
+            color: form.querySelector('#color').value,  // Include the color value
+        };
+
+        fetch('/addEvent', {
+            method: 'POST',
+            body: JSON.stringify(eventData),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Event added successfully');
+            form.reset();
+        })
+        .catch(error => console.error('Error adding event:', error));
+    }
+
+    function removeEvent() {
+            const form = document.getElementById('removeEventForm');
+            const eventId = form.querySelector('#eventId').value;
+
+            fetch(`/deleteEvent/${eventId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert('Event removed successfully');
+                    // You might want to update the UI here, e.g., refresh the event list
+                })
+                .catch(error => console.error('Error removing event:', error));
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch events and populate the event dropdown for absentees list
+            fetch('/events')
+                .then(response => response.json())
+                .then(events => {
+                    const absentEventDropdown = document.getElementById('absentEvent');
+                    events.forEach(event => {
+                        const option = document.createElement('option');
+                        option.value = event.id;
+                        option.textContent = event.title;
+                        absentEventDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching events:', error));
+        });
+    
+        
+        function getAbsentees() {
+        const form = document.getElementById('absenteesListForm');
+        const eventId = form.querySelector('#absentEvent').value;
+        const date = form.querySelector('#absentDate').value;
+        const absenteesListContainer = document.getElementById('absenteesList');
+
+        // Clear previous absentees
+        absenteesListContainer.innerHTML = '';
+
+        // Fetch the absentees for the selected event and date
+        fetch(`/eventAbsences/${eventId}?date=${date}`, {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(absentees => {
+                // Display the list of absentees
+                if (absentees.length > 0) {
+                    const absenteesList = document.createElement('ul');
+                    absentees.forEach(absentee => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${getUsernameById(absentee.userId)} - ${absentee.reason}`;
+                        absenteesList.appendChild(listItem);
+                    });
+
+                    // Append the list to the container
+                    absenteesListContainer.appendChild(absenteesList);
+                } else {
+                    // Display a message if no absentees
+                    absenteesListContainer.innerHTML = '<p>No absentees for the selected event and date.</p>';
+                }
+            })
+            .catch(error => console.error('Error fetching absentees:', error));
+    }
+
+    function getUsernameById(userId) {
+        // Fetch the username based on userId
+        const user = users.find(u => u.id === userId);
+        return user ? user.username : 'Unknown User';
+    }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Fetch users and populate the feedback dropdown
+        fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                const feedbackUserDropdown = document.getElementById('feedbackUser');
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.username;
+                    feedbackUserDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    });
+
+    function submitFeedback() {
+        const form = document.getElementById('privateFeedbackForm');
+        const userId = form.querySelector('#feedbackUser').value;
+        const feedbackText = form.querySelector('#feedback').value;
+
+        // Create a JSON object
+        const feedbackData = {
+            userId: userId,
+            feedback: feedbackText,
+        };
+
+        // Send feedback to the server
+        fetch('/submitFeedback', {
+            method: 'POST',
+            body: JSON.stringify(feedbackData),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Feedback submitted successfully');
+            form.reset();
+        })
+        .catch(error => console.error('Error submitting feedback:', error));
+    }
+    </script>
+</body>
+</html>
