@@ -371,6 +371,7 @@ app.get('/files/:fileName', (req, res) => {
 
     // Check for Range header in the request
     const range = req.headers.range;
+
     if (range) {
       // If Range header is present, respond with partial content (206)
       const parts = range.replace(/bytes=/, '').split('-');
@@ -382,7 +383,7 @@ app.get('/files/:fileName', (req, res) => {
         'Content-Range': `bytes ${start}-${end}/${stats.size}`,
         'Accept-Ranges': 'bytes',
         'Content-Length': chunkSize,
-        'Content-Type': 'video/mp4', // Adjust content type based on your file format
+        'Content-Type': getMimeType(filePath),
       });
 
       const fileStream = fs.createReadStream(filePath, { start, end });
@@ -391,7 +392,7 @@ app.get('/files/:fileName', (req, res) => {
       // If no Range header, respond with entire content (200)
       res.writeHead(200, {
         'Content-Length': stats.size,
-        'Content-Type': 'video/mp4', // Adjust content type based on your file format
+        'Content-Type': getMimeType(filePath),
       });
 
       const fileStream = fs.createReadStream(filePath);
@@ -399,6 +400,22 @@ app.get('/files/:fileName', (req, res) => {
     }
   });
 });
+
+// Helper function to determine MIME type based on file extension
+function getMimeType(filePath) {
+  const extname = path.extname(filePath).toLowerCase();
+  switch (extname) {
+    case '.mp4':
+      return 'video/mp4';
+    case '.webm':
+      return 'video/webm';
+    case '.ogg':
+      return 'video/ogg';
+    // Add more cases as needed
+    default:
+      return 'application/octet-stream';
+  }
+}
 
 
 // Start the server
