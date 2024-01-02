@@ -10,7 +10,7 @@ const app = express();
 const port = 3000;
 const privateFeedbackFile = 'data/privateFeedback.json';
 let privateFeedbackData = loadPrivateFeedback();
-
+const mediaPath = path.join(__dirname, 'data', 'media');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -67,6 +67,9 @@ app.get('/calendar', isAuthenticated, (req, res) => {
   });
   app.get('/notes', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'notes.html'));
+  });
+  app.get('/drive', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'drive.html'));
   });
 
 app.get('/events', isAuthenticated, (req, res) => {
@@ -332,6 +335,34 @@ app.post('/register', (req, res) => {
 
   // Redirect to the login page after successful registration
   res.status(200).json({ message: 'Success' });
+});
+app.get('/files', (req, res) => {
+  const directoryPath = path.join(__dirname, 'data', 'media');
+
+  // Read the files in the directory
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return res.status(500).send('Error reading directory');
+    }
+
+    // Send the list of files as a JSON response
+    res.json({ files });
+  });
+});
+app.get('/files/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = path.join(mediaPath, fileName);
+
+  // Check if the file exists
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      return res.status(404).send('File not found');
+    }
+
+    // Stream the file to the response
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  });
 });
 
 // Start the server
