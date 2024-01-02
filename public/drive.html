@@ -11,19 +11,37 @@
       justify-content: space-around;
     }
 
-    li {
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0;
       list-style: none;
+    }
+
+    li {
       margin: 10px;
       width: 300px; /* Adjust the width as needed */
     }
 
-    video {
+    video, audio {
       width: 100%;
+      color: #4caf50;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    #searchInput {
+      margin-bottom: 10px;
+      color: #4caf50;
     }
   </style>
 </head>
 <body>
-  <h1>Media Player</h1>
+  <h1>Drive</h1>
+  <input type="text" id="searchInput" placeholder="Search...">
   <ul id="fileList"></ul>
 
   <script>
@@ -31,28 +49,74 @@
       .then(response => response.json())
       .then(data => {
         const fileListElement = document.getElementById('fileList');
-        data.files.forEach(file => {
-          const listItem = document.createElement('li');
+        const searchInput = document.getElementById('searchInput');
 
-          // Create a paragraph element for the file name
-          const fileNameElement = document.createElement('p');
-          fileNameElement.textContent = file;
-
-          // Create a video element
-          const video = document.createElement('video');
-
-          // Create a source element for the video
-          const source = document.createElement('source');
-          source.src = `/files/${encodeURIComponent(file)}`;
-          source.type = 'video/mp4'; // Change the type based on your file format
-
-          video.controls = true;
-          video.appendChild(source);
-
-          listItem.appendChild(fileNameElement);
-          listItem.appendChild(video);
-          fileListElement.appendChild(listItem);
+        searchInput.addEventListener('input', () => {
+          const searchTerm = searchInput.value.toLowerCase();
+          const filteredFiles = data.files.filter(file => file.toLowerCase().includes(searchTerm));
+          displayFiles(filteredFiles);
         });
+
+        displayFiles(data.files);
+
+        function displayFiles(files) {
+          fileListElement.innerHTML = ''; // Clear previous content
+
+          files.forEach(file => {
+            const listItem = document.createElement('li');
+
+            // Create a paragraph element for the file name
+            const fileNameElement = document.createElement('p');
+            fileNameElement.textContent = file;
+
+            // Check file extension
+            const fileExtension = file.split('.').pop().toLowerCase();
+
+            if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
+              // Create a video element
+              const video = document.createElement('video');
+              video.controls = true;
+
+              // Create a source element for the video
+              const source = document.createElement('source');
+              source.src = `/files/${encodeURIComponent(file)}`;
+              source.type = 'video/' + fileExtension;
+
+              video.appendChild(source);
+              listItem.appendChild(fileNameElement);
+              listItem.appendChild(video);
+            } else if (['mp3', 'ogg', 'wav'].includes(fileExtension)) {
+              // Create an audio element
+              const audio = document.createElement('audio');
+              audio.controls = true;
+
+              // Create a source element for the audio
+              const source = document.createElement('source');
+              source.src = `/files/${encodeURIComponent(file)}`;
+              source.type = 'audio/' + fileExtension;
+
+              audio.appendChild(source);
+              listItem.appendChild(fileNameElement);
+              listItem.appendChild(audio);
+            } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+              // Create an image element
+              const img = document.createElement('img');
+              img.src = `/files/${encodeURIComponent(file)}`;
+              listItem.appendChild(fileNameElement);
+              listItem.appendChild(img);
+            } else {
+              // Create a download button for other file types
+              const downloadButton = document.createElement('a');
+              downloadButton.href = `/files/${encodeURIComponent(file)}`;
+              downloadButton.download = file;
+              downloadButton.textContent = 'Download';
+              listItem.appendChild(fileNameElement);
+              listItem.appendChild(downloadButton);
+            }
+
+            fileListElement.appendChild(listItem);
+          });
+        }
       })
       .catch(error => console.error('Error:', error));
   </script>

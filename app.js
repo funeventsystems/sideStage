@@ -23,6 +23,16 @@ app.use(bodyParser.json());
 let userData = require('./data/users.json');
 let calendarData = require('./data/calendar.json');
 
+app.use((req, res, next) => {
+  if (req.path === '/login' || req.path === '/') {
+    // Skip authentication for login and landing
+    return next();
+  }
+
+  // For other routes, check authentication
+  isAuthenticated(req, res, next);
+});
+
 // Passport configuration
 passport.use(new LocalStrategy(
   (username, password, done) => {
@@ -216,13 +226,13 @@ let privateNotebookData = loadPrivateNotebooks();
 
 // ...
 
-// Endpoint to create a private notebook
 app.post('/createNotebook', isAuthenticated, (req, res) => {
   const newNotebook = {
     id: generateId(),
     userId: req.user.id,
     title: req.body.title || 'Untitled Notebook',
     content: req.body.content || '',
+    link: req.body.link || ''  // Add the link field
   };
 
   privateNotebookData.push(newNotebook);
@@ -359,11 +369,37 @@ app.get('/files/:fileName', (req, res) => {
       return res.status(404).send('File not found');
     }
 
-    // Stream the file to the response
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
+    // Check for Range header in the request
+    const range = req.headers.range;
+    if (range) {
+      // If Range header is present, respond with partial content (206)
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+      const chunkSize = (end - start) + 1;
+
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': 'video/mp4', // Adjust content type based on your file format
+      });
+
+      const fileStream = fs.createReadStream(filePath, { start, end });
+      fileStream.pipe(res);
+    } else {
+      // If no Range header, respond with entire content (200)
+      res.writeHead(200, {
+        'Content-Length': stats.size,
+        'Content-Type': 'video/mp4', // Adjust content type based on your file format
+      });
+
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    }
   });
 });
+
 
 // Start the server
 app.listen(port, () => {
