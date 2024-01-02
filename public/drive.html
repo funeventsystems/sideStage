@@ -21,6 +21,7 @@
     li {
       margin: 10px;
       width: 300px; /* Adjust the width as needed */
+      border: 1px solid #ddd; /* Add border for grid lines */
     }
 
     video, audio {
@@ -53,7 +54,7 @@
 
         searchInput.addEventListener('input', () => {
           const searchTerm = searchInput.value.toLowerCase();
-          const filteredFiles = data.files.filter(file => file.toLowerCase().includes(searchTerm));
+          const filteredFiles = data.files.filter(file => file.name.toLowerCase().includes(searchTerm));
           displayFiles(filteredFiles);
         });
 
@@ -67,10 +68,10 @@
 
             // Create a paragraph element for the file name
             const fileNameElement = document.createElement('p');
-            fileNameElement.textContent = file;
+            fileNameElement.textContent = file.name;
 
             // Check file extension
-            const fileExtension = file.split('.').pop().toLowerCase();
+            const fileExtension = file.name.split('.').pop().toLowerCase();
 
             if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
               // Create a video element
@@ -79,7 +80,7 @@
 
               // Create a source element for the video
               const source = document.createElement('source');
-              source.src = `/files/${encodeURIComponent(file)}`;
+              source.src = `/files/${encodeURIComponent(file.path)}`;
               source.type = 'video/' + fileExtension;
 
               video.appendChild(source);
@@ -92,7 +93,7 @@
 
               // Create a source element for the audio
               const source = document.createElement('source');
-              source.src = `/files/${encodeURIComponent(file)}`;
+              source.src = `/files/${encodeURIComponent(file.path)}`;
               source.type = 'audio/' + fileExtension;
 
               audio.appendChild(source);
@@ -101,14 +102,14 @@
             } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
               // Create an image element
               const img = document.createElement('img');
-              img.src = `/files/${encodeURIComponent(file)}`;
+              img.src = `/files/${encodeURIComponent(file.path)}`;
               listItem.appendChild(fileNameElement);
               listItem.appendChild(img);
             } else {
               // Create a download button for other file types
               const downloadButton = document.createElement('a');
-              downloadButton.href = `/files/${encodeURIComponent(file)}`;
-              downloadButton.download = file;
+              downloadButton.href = `/files/${encodeURIComponent(file.path)}`;
+              downloadButton.download = file.name;
               downloadButton.textContent = 'Download';
               listItem.appendChild(fileNameElement);
               listItem.appendChild(downloadButton);

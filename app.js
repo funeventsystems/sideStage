@@ -349,19 +349,42 @@ app.post('/register', (req, res) => {
 app.get('/files', (req, res) => {
   const directoryPath = path.join(__dirname, 'data', 'media');
 
-  // Read the files in the directory
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      return res.status(500).send('Error reading directory');
-    }
+  // Recursively read files in the directory and its subdirectories
+  function readFiles(dir) {
+    const filesList = [];
 
-    // Send the list of files as a JSON response
-    res.json({ files });
-  });
+    const files = fs.readdirSync(dir);
+
+    files.forEach((file) => {
+      const filePath = path.join(dir, file);
+      const stats = fs.statSync(filePath);
+
+      if (stats.isDirectory()) {
+        // Recursively read files in subdirectories
+        filesList.push(...readFiles(filePath));
+      } else {
+        filesList.push({
+          name: file,
+          path: filePath.replace(mediaPath, ''), // Store relative path
+          size: stats.size,
+          isDirectory: false,
+          mimeType: getMimeType(filePath),
+        });
+      }
+    });
+
+    return filesList;
+  }
+
+  // Get the list of files
+  const filesData = readFiles(mediaPath);
+
+  // Send the list of files as a JSON response
+  res.json({ files: filesData });
 });
-app.get('/files/:fileName', (req, res) => {
-  const fileName = req.params.fileName;
-  const filePath = path.join(mediaPath, fileName);
+app.get('/files/:filePath', (req, res) => {
+  const filePathParam = req.params.filePath;
+  const filePath = path.join(mediaPath, filePathParam);
 
   // Check if the file exists
   fs.stat(filePath, (err, stats) => {
