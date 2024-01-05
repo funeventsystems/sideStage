@@ -5,6 +5,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const ical = require('ical-generator');
+
 
 const app = express();
 const port = 3000;
@@ -439,6 +441,52 @@ function getMimeType(filePath) {
       return 'application/octet-stream';
   }
 }
+
+
+
+app.get('/ical', isAuthenticated, (req, res) => {
+  // Retrieve events for the authenticated user
+  const userEvents = calendarData.filter(event => event.users.includes(req.user.id));
+
+  // Create an iCalendar object
+  const cal = ical();
+
+  // Add events to the iCalendar object
+  userEvents.forEach(event => {
+    const eventOptions = {
+      start: new Date(event.date),
+      end: new Date(event.date),
+      summary: event.title,
+      description: event.description,
+    };
+
+    // Add location if available
+    if (event.location) {
+      eventOptions.location = event.location;
+    }
+
+    // Add organizer if available
+    if (event.organizer) {
+      eventOptions.organizer = event.organizer;
+    }
+
+    // Add color if available
+    if (event.color) {
+      eventOptions.color = event.color;
+    }
+
+    cal.createEvent(eventOptions);
+  });
+
+  // Set the content type to 'text/calendar'
+  res.header('Content-Type', 'text/calendar');
+  // Set the content disposition to 'attachment' to trigger a download
+  res.header('Content-Disposition', 'attachment; filename=events.ics');
+
+  // Send the iCalendar data as the response
+  res.send(cal.toString());
+});
+
 
 
 // Start the server
