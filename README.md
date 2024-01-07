@@ -1,7 +1,9 @@
 
+# Team Manager Documentation
+
 ## Introduction
 
-Welcome to the documentation for the Team Manager. This software is designed to provide a secure and flexible user authentication system along with a calendar and feedback submission functionality. Please follow the instructions below to get started.
+Welcome to the documentation for the Team Manager application. This software is designed to facilitate team management by providing a suite of features including user authentication, calendar management, feedback submission, private notebooks, and drive functionalities. This documentation will guide you through the installation, setup, and usage of the application.
 
 ## Table of Contents
 
@@ -12,37 +14,48 @@ Welcome to the documentation for the Team Manager. This software is designed to 
     -   Dashboard
     -   Calendar
     -   Feedback
-4. Admin Features
+    -   Private Notebooks
+    -   Drive
+4.  Admin Features
 5.  Screenshots
 6.  Feedback Submission
 7.  Event Management
 8.  Absence Tracking
-9. Default Credentials
+9.  Default Credentials
+
+----------
 
 ## Prerequisites
 
-Before using the software, ensure that you have the following installed:
+Before installing and running the application, ensure that you have the following prerequisites installed on your system:
 
 -   Node.js
 -   npm (Node Package Manager)
+
+----------
 
 ## Installation
 
 1.  Clone the repository to your local machine:
     
+
     
-    `git clone https://github.com/gmanandmarbles/drama-team-management 
+    `git clone https://github.com/gmanandmarbles/drama-team-management.git` 
     
 2.  Navigate to the project directory:
     
+
     
     `cd drama-team-management` 
     
 3.  Install the required dependencies:
     
+
     
     `npm install` 
     
+
+----------
 
 ## Usage
 
@@ -65,8 +78,24 @@ Before using the software, ensure that you have the following installed:
 
 ### Feedback
 
--   Submit feedback at `http://localhost:3000/feedback`.
+-   Submit feedback at `http://localhost:3000/submitFeedback`.
 -   Provide your feedback through the form.
+
+### Private Notebooks
+
+-   Users can create private notebooks at `http://localhost:3000/createNotebook`.
+-   View all private notebooks at `http://localhost:3000/notebooks`.
+-   Retrieve a specific private notebook by its ID at `http://localhost:3000/notebook/:notebookId`.
+-   Update a private notebook by its ID at `http://localhost:3000/notebook/:notebookId`.
+-   Delete a private notebook by its ID at `http://localhost:3000/notebook/:notebookId`.
+
+### Drive
+
+-   Access the drive at `http://localhost:3000/drive`.
+-   View all files stored in the drive at `http://localhost:3000/files`.
+-   Download a specific file by its path at `http://localhost:3000/files/:filePath`.
+
+----------
 
 ## Admin Features
 
@@ -76,14 +105,20 @@ Before using the software, ensure that you have the following installed:
 -   Delete events at `http://localhost:3000/deleteEvent/:eventId`.
 -   View absences for a specific event at `http://localhost:3000/eventAbsences/:eventId`.
 
+----------
+
 ## Screenshots
 
 Please refer to the provided screenshots for a visual guide on the respective pages.
+
+----------
 
 ## Feedback Submission
 
 -   Users can submit feedback at `http://localhost:3000/submitFeedback`.
 -   Feedback is stored securely and can be viewed by admins.
+
+----------
 
 ## Event Management
 
@@ -91,22 +126,26 @@ Please refer to the provided screenshots for a visual guide on the respective pa
 -   Add new events at `http://localhost:3000/addEvent`.
 -   Delete events at `http://localhost:3000/deleteEvent/:eventId`.
 
+----------
+
 ## Absence Tracking
 
 -   Users can mark their absence for a specific event at `http://localhost:3000/markAbsence/:eventId`.
 -   Admins can view event absences at `http://localhost:3000/eventAbsences/:eventId`.
 
+----------
 
 ## Default Credentials
 
-Admin user:
-Username: `admin` 
-Password: `adminpassword`
-
-Normal user:
-Username: `user`
-Password: `password`
-
-Test user:
-Username: `test`
-Password: `test`
+-   **Admin user:**
+    
+    -   Username: `admin`
+    -   Password: `adminpassword`
+-   **Normal user:**
+    
+    -   Username: `user`
+    -   Password: `password`
+-   **Test user:**
+    
+    -   Username: `test`
+    -   Password: `test`
