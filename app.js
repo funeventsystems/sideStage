@@ -133,6 +133,18 @@ app.put('/editEvent/:eventId', isAdmin, (req, res) => {
     res.status(404).json({ error: 'Event not found' });
   }
 });
+app.get('/geteventdetails/:eventId', isAuthenticated, (req, res) => {
+  const eventId = req.params.eventId;
+
+  // Find the event in calendarData based on eventId
+  const event = calendarData.find(event => event.id === eventId);
+
+  if (event) {
+      res.json(event);
+  } else {
+      res.status(404).json({ error: 'Event not found' });
+  }
+});
 
   
 app.get('/users', isAuthenticated, (req, res) => {
