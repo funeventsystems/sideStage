@@ -40,6 +40,21 @@
                 width: 100%;
             }
         }
+        #logout {
+            display: block;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e74c3c; /* Red color for logout button */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        #logout:hover {
+            background-color: #c0392b; /* Darker red color on hover */
+        }
     </style>
 </head>
 <body>
@@ -53,13 +68,13 @@
         <a href="/admin">Admin Page</a>
         <!-- Add additional admin links as needed -->
     </div>
-
+    <a id="logout" href="/logout">Logout</a>
     <!-- Collapsible section for feedback -->
     <div class="collapsible" onclick="toggleFeedback()">Feedback</div>
     <div class="content" id="feedbackContent">
         <!-- Feedback will be dynamically inserted here using JavaScript -->
     </div>
-
+   
     <script>
         // Function to toggle visibility of admin links
         function toggleAdminLinks() {

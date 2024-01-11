@@ -62,13 +62,25 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/login', (req, res) => {
+aapp.get('/login', (req, res) => {
+  // Check if the user is already authenticated
+  if (req.isAuthenticated()) {
+    return res.redirect('/dashboard');
+  }
+
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.post('/login',
   passport.authenticate('local', { successRedirect: '/dashboard', failureRedirect: '/login' })
 );
+app.get('/logout', (req, res) => {
+  // Passport provides a logout() function to clear the login session
+  req.logout();
+
+  // Redirect the user to the login page after logout
+  res.redirect('/login');
+});
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
