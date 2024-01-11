@@ -111,6 +111,29 @@ app.post('/addEvent', isAdmin, (req, res) => {
 
     res.json(newEvent);
 });
+// Endpoint to edit an event
+app.put('/editEvent/:eventId', isAdmin, (req, res) => {
+  const eventId = req.params.eventId;
+
+  // Find the index of the event in calendarData based on eventId
+  const eventIndex = calendarData.findIndex(event => event.id === eventId);
+
+  if (eventIndex !== -1) {
+    // Update event properties with the provided values (if present)
+    calendarData[eventIndex].title = req.body.title || calendarData[eventIndex].title;
+    calendarData[eventIndex].date = req.body.date || calendarData[eventIndex].date;
+    calendarData[eventIndex].description = req.body.description || calendarData[eventIndex].description;
+    calendarData[eventIndex].color = req.body.color || calendarData[eventIndex].color;
+
+    // Save the updated data
+    saveData('calendar.json', calendarData);
+
+    res.json(calendarData[eventIndex]);
+  } else {
+    res.status(404).json({ error: 'Event not found' });
+  }
+});
+
   
 app.get('/users', isAuthenticated, (req, res) => {
     res.json(userData);
