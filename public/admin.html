@@ -182,6 +182,7 @@
                 })
                 .catch(error => console.error('Error fetching users:', error));
         });
+       
     
             function addEvent() {
             const form = document.getElementById('addEventForm');
@@ -332,97 +333,132 @@
             .catch(error => console.error('Error submitting feedback:', error));
         }
         function showEditForm() {
-            const form = document.getElementById('editEventForm');
-            const eventId = form.querySelector('#editEventId').value;
+    const form = document.getElementById('editEventForm');
+    const eventId = form.querySelector('#editEventId').value;
 
-            // Fetch event details based on the event ID
-            fetch(`/getEventDetails/${eventId}`)
-                .then(response => response.json())
-                .then(eventDetails => {
-                    const editEventContainer = document.getElementById('editEventContainer');
-                    const editEventDetails = document.getElementById('editEventDetails');
+    // Fetch event details based on the event ID
+    fetch(`/getEventDetails/${eventId}`)
+        .then(response => response.json())
+        .then(eventDetails => {
+            const editEventContainer = document.getElementById('editEventContainer');
+            const editEventDetails = document.getElementById('editEventDetails');
 
-                    // Clear previous details
-                    editEventDetails.innerHTML = '';
+            // Clear previous details
+            editEventDetails.innerHTML = '';
 
-                    // Display event details for editing
-                    const editForm = document.createElement('form');
-                    editForm.classList.add('edit-form');
+            // Display event details for editing
+            const editForm = document.createElement('form');
+            editForm.classList.add('edit-form');
 
-                    const titleLabel = document.createElement('label');
-                    titleLabel.textContent = 'Title:';
-                    const titleInput = document.createElement('input');
-                    titleInput.type = 'text';
-                    titleInput.value = eventDetails.title;
-                    titleLabel.appendChild(titleInput);
+            // Create title input
+            const titleLabel = document.createElement('label');
+            titleLabel.textContent = 'Title:';
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.value = eventDetails.title;
+            titleLabel.appendChild(titleInput);
 
-                    const dateLabel = document.createElement('label');
-                    dateLabel.textContent = 'Date:';
-                    const dateInput = document.createElement('input');
-                    dateInput.type = 'date';
-                    dateInput.value = eventDetails.date;
-                    dateLabel.appendChild(dateInput);
+            // Create date input
+            const dateLabel = document.createElement('label');
+            dateLabel.textContent = 'Date:';
+            const dateInput = document.createElement('input');
+            dateInput.type = 'date';
+            dateInput.value = eventDetails.date;
+            dateLabel.appendChild(dateInput);
 
-                    const descriptionLabel = document.createElement('label');
-                    descriptionLabel.textContent = 'Description:';
-                    const descriptionInput = document.createElement('textarea');
-                    descriptionInput.value = eventDetails.description;
-                    descriptionLabel.appendChild(descriptionInput);
+            // Create description input
+            const descriptionLabel = document.createElement('label');
+            descriptionLabel.textContent = 'Description:';
+            const descriptionInput = document.createElement('textarea');
+            descriptionInput.value = eventDetails.description;
+            descriptionLabel.appendChild(descriptionInput);
 
-                    const submitButton = document.createElement('button');
-                    submitButton.type = 'button';
-                    submitButton.textContent = 'Update Event';
-                    submitButton.addEventListener('click', function () {
-                        updateEvent(eventId);
-                    });
+            // Create user checkboxes dynamically
+            const userCheckboxesContainer = document.createElement('div');
+            userCheckboxesContainer.id = 'userCheckboxesEdit';
 
-                    editForm.appendChild(titleLabel);
-                    editForm.appendChild(dateLabel);
-                    editForm.appendChild(descriptionLabel);
-                    editForm.appendChild(submitButton);
+            window.users.forEach(user => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `user${user.id}Edit`;
+                checkbox.name = 'updateUsers[]';
+                checkbox.value = user.id;
 
-                    editEventDetails.appendChild(editForm);
-                    editEventContainer.style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error fetching event details:', error);
-                    alert('Error fetching event details. Please try again.');
-                });
-        }
+                // Check the checkbox if the user is associated with the event
+                if (eventDetails.users.includes(user.id)) {
+                    checkbox.checked = true;
+                }
 
-        function updateEvent(eventId) {
-            const editForm = document.querySelector('.edit-form');
-            const updatedTitle = editForm.querySelector('input[type="text"]').value;
-            const updatedDate = editForm.querySelector('input[type="date"]').value;
-            const updatedDescription = editForm.querySelector('textarea').value;
+                const label = document.createElement('label');
+                label.for = `user${user.id}Edit`;
+                label.textContent = user.username;
 
-            fetch(`/editEvent/${eventId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: updatedTitle,
-                    date: updatedDate,
-                    description: updatedDescription,
-                }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const editEventContainer = document.getElementById('editEventContainer');
-                    const editEventDetails = document.getElementById('editEventDetails');
+                userCheckboxesContainer.appendChild(checkbox);
+                userCheckboxesContainer.appendChild(label);
+            });
 
-                    // Hide the edit form after updating
-                    editEventContainer.style.display = 'none';
+            // Create submit button
+            const submitButton = document.createElement('button');
+            submitButton.type = 'button';
+            submitButton.textContent = 'Update Event';
+            submitButton.addEventListener('click', function () {
+                updateEvent(eventId);
+            });
 
-                    // Display a success message or update UI as needed
-                    alert('Event updated successfully');
-                })
-                .catch(error => {
-                    console.error('Error updating event:', error);
-                    alert('Error updating event. Please try again.');
-                });
-        }
+            editForm.appendChild(titleLabel);
+            editForm.appendChild(dateLabel);
+            editForm.appendChild(descriptionLabel);
+            editForm.appendChild(userCheckboxesContainer);
+            editForm.appendChild(submitButton);
+
+            editEventDetails.appendChild(editForm);
+            editEventContainer.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching event details:', error);
+            alert('Error fetching event details. Please try again.');
+        });
+}
+
+
+function updateEvent(eventId) {
+    const editForm = document.querySelector('.edit-form');
+    const updatedTitle = editForm.querySelector('input[type="text"]').value;
+    const updatedDate = editForm.querySelector('input[type="date"]').value;
+    const updatedDescription = editForm.querySelector('textarea').value;
+
+    // Manually add selected user IDs to the formData
+    const selectedUsers = Array.from(editForm.querySelectorAll('input[name="updateUsers[]"]:checked')).map(checkbox => checkbox.value);
+
+    fetch(`/updateEvent/${eventId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: updatedTitle,
+            date: updatedDate,
+            description: updatedDescription,
+            updateUsers: selectedUsers,  // Include the selected users
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            const editEventContainer = document.getElementById('editEventContainer');
+            const editEventDetails = document.getElementById('editEventDetails');
+
+            // Hide the edit form after updating
+            editEventContainer.style.display = 'none';
+
+            // Display a success message or update UI as needed
+            alert('Event updated successfully');
+        })
+        .catch(error => {
+            console.error('Error updating event:', error);
+            alert('Error updating event. Please try again.');
+        });
+}
+
         </script>
 </body>
 

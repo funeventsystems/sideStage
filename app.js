@@ -111,28 +111,45 @@ app.post('/addEvent', isAdmin, (req, res) => {
 
     res.json(newEvent);
 });
-// Endpoint to edit an event
-app.put('/editEvent/:eventId', isAdmin, (req, res) => {
+// Update Event endpoint
+app.put('/updateEvent/:eventId', isAdmin, (req, res) => {
   const eventId = req.params.eventId;
 
   // Find the index of the event in calendarData based on eventId
   const eventIndex = calendarData.findIndex(event => event.id === eventId);
 
   if (eventIndex !== -1) {
-    // Update event properties with the provided values (if present)
-    calendarData[eventIndex].title = req.body.title || calendarData[eventIndex].title;
-    calendarData[eventIndex].date = req.body.date || calendarData[eventIndex].date;
-    calendarData[eventIndex].description = req.body.description || calendarData[eventIndex].description;
-    calendarData[eventIndex].color = req.body.color || calendarData[eventIndex].color;
+      // Update event properties with the provided values (if present)
+      calendarData[eventIndex].title = req.body.title || calendarData[eventIndex].title;
+      calendarData[eventIndex].date = req.body.date || calendarData[eventIndex].date;
+      calendarData[eventIndex].description = req.body.description || calendarData[eventIndex].description;
+      calendarData[eventIndex].color = req.body.color || calendarData[eventIndex].color;
 
-    // Save the updated data
-    saveData('calendar.json', calendarData);
+      // Add or remove users based on the updateUsers array
+      if (req.body.updateUsers && Array.isArray(req.body.updateUsers)) {
+          req.body.updateUsers.forEach(userId => {
+              if (!calendarData[eventIndex].users.includes(userId)) {
+                  // Add the user to the event
+                  calendarData[eventIndex].users.push(userId);
+              }
+          });
 
-    res.json(calendarData[eventIndex]);
+          // Remove users not in the updateUsers array
+          calendarData[eventIndex].users = calendarData[eventIndex].users.filter(userId =>
+              req.body.updateUsers.includes(userId)
+          );
+      }
+
+      // Save the updated data
+      saveData('calendar.json', calendarData);
+
+      res.json(calendarData[eventIndex]);
   } else {
-    res.status(404).json({ error: 'Event not found' });
+      res.status(404).json({ error: 'Event not found' });
   }
 });
+
+
 app.get('/geteventdetails/:eventId', isAuthenticated, (req, res) => {
   const eventId = req.params.eventId;
 
