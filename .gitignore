@@ -9,6 +9,10 @@ lerna-debug.log*
 
 # Media Directory
 data/Media/testing/*
+data/calendar.json
+data/privateFeedback.json
+data/privetNotebooks.json
+data/users.json
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

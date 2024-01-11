@@ -76,10 +76,13 @@ app.post('/login',
 );
 app.get('/logout', (req, res) => {
   // Passport provides a logout() function to clear the login session
-  req.logout();
-
-  // Redirect the user to the login page after logout
-  res.redirect('/login');
+  req.logout(err => {
+    if (err) {
+      console.error(err);
+    }
+    // Redirect the user to the login page after logout
+    res.redirect('/login');
+  });
 });
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
