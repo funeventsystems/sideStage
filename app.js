@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 });
 
 
-aapp.get('/login', (req, res) => {
+app.get('/login', (req, res) => {
   // Check if the user is already authenticated
   if (req.isAuthenticated()) {
     return res.redirect('/dashboard');
