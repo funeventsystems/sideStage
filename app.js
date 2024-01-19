@@ -514,6 +514,112 @@ function getMimeType(filePath) {
 
 
 
+const auditionProfilesFile = 'data/auditionProfiles.json';
+let auditionProfilesData = loadAuditionProfiles();
+
+function loadAuditionProfiles() {
+  try {
+    const data = fs.readFileSync(auditionProfilesFile);
+    return JSON.parse(data);
+  } catch (error) {
+    // If the file doesn't exist or there's an error reading it, return an empty array
+    return [];
+  }
+}
+
+// Helper function to save audition profiles data to the JSON file
+function saveAuditionProfiles(data) {
+  const jsonData = JSON.stringify(data, null, 2);
+  fs.writeFileSync(auditionProfilesFile, jsonData);
+}
+
+// Endpoint to get auditions
+app.get('/getAuditions', isAdmin, (req, res) => {
+  res.json(auditionProfilesData);
+});
+
+// Endpoint to create audition profile
+app.post('/createAuditionProfile', isAdmin, (req, res) => {
+  const { name, taGrade, roles } = req.body;
+
+  if (!name || !taGrade || !roles || !Array.isArray(roles)) {
+    return res.status(400).json({ error: 'Invalid data provided for creating audition profile' });
+  }
+
+  const newAuditionProfile = {
+    id: generateId(),
+    name,
+    taGrade,
+    roles,
+    scores: [],
+  };
+
+  auditionProfilesData.push(newAuditionProfile);
+  saveAuditionProfiles(auditionProfilesData);
+
+  res.json({ auditionID: newAuditionProfile.id });
+});
+
+// Endpoint to submit score for an audition profile
+app.post('/submitScore', isAdmin, (req, res) => {
+  const { id, score } = req.body;
+
+  if (!id || !score || typeof score !== 'number') {
+    return res.status(400).json({ error: 'Invalid data provided for submitting score' });
+  }
+
+  const auditionProfile = auditionProfilesData.find(profile => profile.id === id);
+
+  if (!auditionProfile) {
+    return res.status(404).json({ error: 'Audition profile not found' });
+  }
+
+  auditionProfile.scores.push(score);
+  saveAuditionProfiles(auditionProfilesData);
+
+  res.json({ success: true });
+});
+
+// Endpoint to get details of a specific audition profile
+app.get('/getAuditionDetails/:id', isAdmin, (req, res) => {
+  const auditionID = req.params.id;
+
+  const auditionProfile = auditionProfilesData.find(profile => profile.id === auditionID);
+
+  if (!auditionProfile) {
+    return res.status(404).json({ error: 'Audition profile not found' });
+  }
+
+  res.json(auditionProfile);
+});
+
+// Function to calculate average score
+function calculateAverageScore(scores) {
+  if (!scores || scores.length === 0) {
+    return 0;
+  }
+
+  const sum = scores.reduce((total, score) => total + score, 0);
+  const average = sum / scores.length;
+
+  return average;
+}
+
+// Endpoint to get average score for a specific audition profile
+app.get('/getAverageScore/:id', isAdmin, (req, res) => {
+  const auditionID = req.params.id;
+
+  const auditionProfile = auditionProfilesData.find(profile => profile.id === auditionID);
+
+  if (!auditionProfile) {
+    return res.status(404).json({ error: 'Audition profile not found' });
+  }
+
+  const averageScore = calculateAverageScore(auditionProfile.scores);
+
+  res.json({ averageScore });
+});
+
 
 
 
