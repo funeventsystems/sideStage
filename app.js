@@ -567,7 +567,7 @@ app.post('/createAuditionProfile', isAdmin, (req, res) => {
 app.post('/submitScore', isAdmin, (req, res) => {
   const { id, score } = req.body;
 
-  if (!id || !score || typeof score !== 'number') {
+  if (!id || !score) {
     return res.status(400).json({ error: 'Invalid data provided for submitting score' });
   }
 
