@@ -91,6 +91,9 @@ app.get('/logout', (req, res) => {
 app.get('/dashboard', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
+app.get('/audition', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'audition.html'));
+});
 
 app.get('/calendar', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'calendar.html'));
