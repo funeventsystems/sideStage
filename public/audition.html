@@ -113,19 +113,25 @@
 
     // Function to list and filter auditions
     async function listAndFilterAuditions() {
-      const auditions = await fetchData('/getAuditions');
-      const auditionList = document.getElementById('auditionList');
+  try {
+    const auditions = await fetchData('/getAuditions');
+    const auditionList = document.getElementById('auditionList');
 
-      // Clear existing list items
-      auditionList.innerHTML = '';
+    // Clear existing list items
+    auditionList.innerHTML = '';
 
-      // Populate the list
-      auditions.forEach(audition => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `Name: ${audition.name}, TA Grade: ${audition.taGrade}, Roles: ${audition.roles.join(', ')}`;
-        auditionList.appendChild(listItem);
-      });
-    }
+    // Populate the list
+    auditions.forEach(audition => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Name: ${audition.name}, TA Grade: ${audition.taGrade}, Roles: ${audition.roles.join(', ')}`;
+      auditionList.appendChild(listItem);
+    });
+  } catch (error) {
+    console.error('Error fetching auditions:', error);
+    alert('Failed to fetch auditions. Please try again.');
+  }
+}
+
 
     // Function to submit audition profile
     async function submitAuditionProfile() {
