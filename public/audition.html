@@ -84,6 +84,7 @@
   <script>
     function toggleMenu(menuId) {
       const menu = document.getElementById(menuId);
+      listAndFilterAuditions()
       if (menu.style.display === 'block') {
         menu.style.display = 'none';
       } else {
@@ -123,7 +124,7 @@
     // Populate the list
     auditions.forEach(audition => {
       const listItem = document.createElement('li');
-      listItem.textContent = `Name: ${audition.name}, TA Grade: ${audition.taGrade}, Roles: ${audition.roles.join(', ')}`;
+      listItem.textContent = `Name: ${audition.name}, TA Grade: ${audition.taGrade}, Roles: ${audition.roles.join(', ')}, Score: ${audition.scores.join(', ')}`;
       auditionList.appendChild(listItem);
     });
   } catch (error) {
