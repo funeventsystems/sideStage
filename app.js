@@ -104,6 +104,9 @@ app.get('/calendar', isAuthenticated, (req, res) => {
   app.get('/drive', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'drive.html'));
   });
+app.get('/mail', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'mailbox.html'));
+  });
 
 app.get('/events', isAuthenticated, (req, res) => {
     // Display calendar (view-only mode)
