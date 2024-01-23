@@ -116,10 +116,19 @@ app.get('/events', isAuthenticated, (req, res) => {
 app.get('/admin', isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
-app.get('/verifytickets', isAdmin, (req, res) => {
+app.get('/verifytickets', isAdmin || isFrontOfHouse, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verifytickets.html'));
 });
 app.get('/ticketsetup', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+});
+app.get('/soundStage', isAdmin || isTechCrew, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+});
+app.get('/videoStage', isAdmin || isTechCrew, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+});
+app.get('/lightStage', isAdmin || isTechCrew, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
 });
 
@@ -212,6 +221,15 @@ function isAuthenticated(req, res, next) {
 
 function isAdmin(req, res, next) {
   if (req.isAuthenticated() && req.user.role === 'admin') return next();
+  res.redirect('/');
+}
+
+function isTechCrew(req, res, next) {
+  if (req.isAuthenticated() && req.user.role === 'tech') return next();
+  res.redirect('/');
+}
+function isFrontOfHouse(req, res, next) {
+  if (req.isAuthenticated() && req.user.role === 'frontofhouse') return next();
   res.redirect('/');
 }
 
