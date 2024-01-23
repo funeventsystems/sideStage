@@ -29,7 +29,7 @@
     <script>
         // Function to fetch and display private feedback data
         function fetchPrivateFeedbackData() {
-            fetch('/private-feedback') // Replace '/private-feedback' with the actual endpoint
+            fetch('/feedback') // Replace '/private-feedback' with the actual endpoint
                 .then(response => response.json())
                 .then(privateFeedbackData => displayPrivateFeedback(privateFeedbackData))
                 .catch(error => console.error('Error fetching private feedback:', error));
