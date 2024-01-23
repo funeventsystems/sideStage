@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Verify Ticket</title>
+  <link rel="stylesheet" href="styles"> <!-- Link to the same stylesheet -->
+</head>
+<body>
+<header>
+  <h1>Verify Ticket</h1>
+</header>
+<form id="verifyTicketForm">
+  <label for="ticketId">Enter Ticket ID:</label>
+  <input type="text" id="ticketId" name="ticketId" required>
+  <button type="submit">Verify Ticket</button>
+</form>
+
+<div id="result"></div>
+
+<!-- Green success screen -->
+<div class="success-screen" id="success-screen"></div>
+
+
+<script>
+  const form = document.getElementById('verifyTicketForm');
+  const resultDiv = document.getElementById('result');
+  const successScreen = document.getElementById('success-screen');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const ticketId = document.getElementById('ticketId').value;
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('POST', `/api/verifyticket/${ticketId}`, true);
+
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        resultDiv.innerHTML = `<p>${data.message}</p>`;
+        // Show the green success screen
+        successScreen.style.opacity = '1';
+        successScreen.style.pointerEvents = 'auto';
+        // Reload the page after a delay
+        setTimeout(() => {
+          location.reload();
+        }, 2000); // Adjust the delay as needed (2 seconds in this example)
+      } else {
+        resultDiv.innerHTML = `<p>An error occurred.</p>`;
+        setTimeout(() => {
+          location.reload();
+        }, 2000); // Adjust the delay as needed (2 seconds in this example)
+      }
+    };
+
+    xhr.onerror = function () {
+      resultDiv.innerHTML = `<p>An error occurred.</p>`;
+      setTimeout(() => {
+        location.reload();
+      }, 2000); // Adjust the delay as needed (2 seconds in this example)
+    };
+
+    xhr.send();
+  });
+</script>
+
+</body>
+</html>
