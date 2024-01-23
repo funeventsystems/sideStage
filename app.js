@@ -624,7 +624,103 @@ app.get('/getAverageScore/:id', isAdmin, (req, res) => {
 });
 
 
+let classData = loadClassData();
 
+// ...
+
+// Endpoint to view classes
+app.get('/classes', isAuthenticated, (req, res) => {
+  res.json(classData);
+});
+
+// Endpoint to mark a class as complete
+app.post('/markComplete/:classId', isAuthenticated, (req, res) => {
+  const classId = req.params.classId;
+
+  const classIndex = classData.findIndex((c) => c.id === classId);
+
+  if (classIndex !== -1) {
+    // Mark the class as complete for the authenticated user
+    const userId = req.session.passport.user; // Extract user ID from the session
+    if (!classData[classIndex].completedBy.includes(userId)) {
+      classData[classIndex].completedBy.push(userId);
+    }
+
+    // Save the updated data
+    saveClassData();
+
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Class not found' });
+  }
+});
+
+// Admin endpoint to view class completions
+app.get('/admin/classes/:classId/completions', isAdmin, (req, res) => {
+  const classId = req.params.classId;
+
+  const classIndex = classData.findIndex((c) => c.id === classId);
+
+  if (classIndex !== -1) {
+    // Get the list of users who completed the class
+    const completedUsers = classData[classIndex].completedBy.map((userId) => {
+      const user = userData.find((u) => u.id === userId);
+      return { id: user.id, username: user.username };
+    });
+
+    res.json(completedUsers);
+  } else {
+    res.status(404).json({ error: 'Class not found' });
+  }
+});
+
+// Admin endpoint to create a new class
+app.post('/admin/classes', isAdmin, (req, res) => {
+  const { title, videoUrl } = req.body;
+
+  if (!title || !videoUrl) {
+    return res.status(400).json({ error: 'Invalid data provided for creating a class' });
+  }
+
+  const newClass = {
+    id: generateId(),
+    title,
+    videoUrl,
+    completedBy: [],
+  };
+
+  classData.push(newClass);
+  saveClassData();
+
+  res.json({ classId: newClass.id });
+});
+
+// ...
+
+// Helper function to save class data to a JSON file
+function saveClassData() {
+  saveData('classes.json', classData);
+}
+
+// Helper function to load class data from the JSON file
+function loadClassData() {
+  try {
+    const data = fs.readFileSync('data/classes.json');
+    return JSON.parse(data);
+  } catch (error) {
+    // If the file doesn't exist or there's an error reading it, return an empty array
+    return [];
+  }
+}
+
+app.get('/user/classes', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'user-classes.html'));
+});
+
+// Admin route to manage classes (Admin-side)
+app.get('/admin/classes', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-classes.html'));
+});
 
 
 
