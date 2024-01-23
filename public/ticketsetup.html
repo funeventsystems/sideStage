@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket System</title>
+     <link rel="stylesheet" href="styles"> 
+    <style> 
+        /* CSS for the green screen */
+        .success-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: green;
+            opacity: 0;
+            transition: opacity 2s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lookup Ticket</h1>
+  <form id="lookup-form">
+        <label for="ticketId">Ticket ID:</label>
+        <input type="text" id="ticketId" name="ticketId" required>
+        <button type="submit">Lookup</button>
+    </form>
+    <div id="ticket-result"></div>
+
+    <h1>Admin Setup</h1>
+<!-- Admin Setup Form -->
+<form id="admin-setup-form">
+    <label>Select Date:</label><br>
+    <input type="radio" id="date1" name="date" value="2024-5-15" required>
+    <label for="date1">May 15th</label><br>
+    <input type="radio" id="date2" name="date" value="2024-5-16" required>
+    <label for="date2">May 16th</label><br>
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" required>
+    <label for="amount">Ticket Amount:</label>
+    <input type="number" id="amount" name="amount" min="1" required>
+
+    <!-- New checkbox for virtual ticket option -->
+    <label for="virtualTicket">Virtual Ticket:</label>
+    <input type="checkbox" id="virtualTicket" name="virtualTicket">
+
+    <button type="submit">Setup Ticket</button>
+</form>
+
+    
+    <div id="success-screen" class="success-screen"></div>
+
+    <div id="admin-setup-result"></div>
+
+    <script>
+        const lookupForm = document.getElementById('lookup-form');
+        const ticketIdInput = document.getElementById('ticketId');
+        const ticketResult = document.getElementById('ticket-result');
+
+        const adminSetupForm = document.getElementById('admin-setup-form');
+        const emailInput = document.getElementById('email');
+        const amountInput = document.getElementById('amount'); // Get the ticket amount input
+        const adminSetupResult = document.getElementById('admin-setup-result');
+        const successScreen = document.getElementById('success-screen');
+
+        lookupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ticketId = ticketIdInput.value;
+            const response = await fetch(`/api/ticket/${ticketId}`);
+            const data = await response.json();
+            if (response.ok) {
+                ticketResult.innerHTML = `<p>Ticket ID: ${data.id}</p><p>Date: ${data.date}</p><p>Email: ${data.email}</p><p>Livestream URL: ${data.livestreamurl}</p>`;
+            } else {
+                ticketResult.innerHTML = `<p>${data.error}</p>`;
+            }
+        });
+
+               adminSetupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const selectedDate = document.querySelector('input[name="date"]:checked');
+    const date = selectedDate ? selectedDate.value : '';
+    const email = emailInput.value;
+    const amount = parseInt(amountInput.value, 10);
+    const virtualTicket = document.getElementById('virtualTicket').checked;
+
+    const response = await fetch('/api/registershow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ date, email, amount, virtualTicket }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        // Show the green success screen
+        successScreen.style.opacity = '1';
+        successScreen.style.pointerEvents = 'auto';
+
+        // Reload the page after a delay
+        setTimeout(() => {
+            location.reload();
+        }, 2000); // Adjust the delay as needed (2 seconds in this example)
+    } else {
+        adminSetupResult.innerHTML = `<p>${data.error}</p>`;
+    }
+});
+
+        const giftTicketForm = document.getElementById('gift-ticket-form');
+const recipientEmailInput = document.getElementById('recipientEmail');
+const senderNameInput = document.getElementById('senderName');
+const giftMessageInput = document.getElementById('giftMessage');
+const ticketAmountInput = document.getElementById('ticketAmount'); // Get the ticket amount input for gift
+
+giftTicketForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const recipientEmail = recipientEmailInput.value;
+    const senderName = senderNameInput.value;
+    const giftMessage = giftMessageInput.value;
+    const ticketAmount = parseInt(ticketAmountInput.value, 10); // Parse the ticket amount as an integer
+
+    // Send a POST request to the server for gift ticket registration
+    const response = await fetch('/api/giftticket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipientEmail, senderName, giftMessage, ticketAmount }), // Include recipient email, sender name, gift message, and ticket amount
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        // Display a success message or perform any other desired action
+        console.log(data.message);
+    } else {
+        // Display an error message or handle errors as needed
+        console.error(data.error);
+    }
+});
+    </script>
+</body>
+</html>
