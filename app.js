@@ -123,13 +123,13 @@ app.get('/ticketsetup', isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
 });
 app.get('/soundStage', isAdmin || isTechCrew, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+  res.sendFile(path.join(__dirname, 'public', 'soundStage.html'));
 });
 app.get('/videoStage', isAdmin || isTechCrew, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+  res.sendFile(path.join(__dirname, 'public', 'videoStage.html'));
 });
 app.get('/lightStage', isAdmin || isTechCrew, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+  res.sendFile(path.join(__dirname, 'public', 'lightStage.html'));
 });
 
 app.post('/addEvent', isAdmin, (req, res) => {
