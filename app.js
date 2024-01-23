@@ -116,6 +116,12 @@ app.get('/events', isAuthenticated, (req, res) => {
 app.get('/admin', isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
+app.get('/verifytickets', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'verifytickets.html'));
+});
+app.get('/ticketsetup', isAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ticketsetup.html'));
+});
 
 app.post('/addEvent', isAdmin, (req, res) => {
     const newEvent = {
